@@ -1,0 +1,53 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.build/
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.env
+.env.example
+!.env.example
+
+# ---- Tools & caches ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+coverage.xml
+htmlcov/
+.cache/
+.dmypy.json
+pytestdebug.log
+
+# ---- Editors ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# ---- Project data ----
+data/raw/
+data/processed/
+data/index/
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/index/.gitkeep
+data/.ingestion_progress.json
+logs/
+*.log
+
+# ---- Models / checkpoints (local only) ----
+models/
+checkpoints/
+
+# ---- Docker ----
+*.pid
+docker/*.local

@@ -16,7 +16,6 @@ venv/
 !.env.example
 
 # ---- Tools & caches ----
-.pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .ipynb_checkpoints/
@@ -51,3 +50,7 @@ checkpoints/
 # ---- Docker ----
 *.pid
 docker/*.local
+
+# pytest
+.pytest_cache/
+pytest-cache-files-*/

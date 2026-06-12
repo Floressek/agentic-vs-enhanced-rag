@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "🚀 Starting RAGx Chat UI..."
+echo "Starting RAGx Chat UI..."
 echo ""
 echo "Make sure the API server is running:"
 echo "  python -m src.ragx.api.main"

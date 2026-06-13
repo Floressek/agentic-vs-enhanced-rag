@@ -115,9 +115,9 @@ def main() -> None:
     )
     parser.add_argument(
         "--use-prefixes",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
         default=True,
-        help="Use query:/passage: prefixes for E5/GTE models",
+        help="Use query:/passage: prefixes for E5/GTE models (--no-use-prefixes to disable)",
     )
     parser.add_argument(
         "--qdrant-url",
@@ -270,6 +270,7 @@ def main() -> None:
                 texts,
                 show_progress=False,
                 convert_to_numpy=False,
+                add_prefix=True,  # passage prefix applied by embedder when use_prefixes=True
             )
 
             vector_store.add(

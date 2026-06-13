@@ -10,7 +10,7 @@ sys.path.insert(0, str(project_root))
 import logging
 
 from src.ragx.evaluation.ablation_study import AblationStudy
-from src.ragx.evaluation.ragas_evaluator import RAGASEvaluator
+from src.ragx.evaluation.deepeval_evaluator import DeepEvalEvaluator
 from src.ragx.evaluation.configs import (
     BASELINE,
     RERANKER_ONLY,
@@ -205,10 +205,10 @@ def main():
             "cove_auto_only",
             "cot_enhanced",
             "multihop_cot",
-            "multihop_only",
             "full_no_cove",
             "full_cove_auto",
             "full_cove_metadata",
+            "full_cove_suggest",
         ],
         default=None,
         help="Specific configurations to test (default: all)",
@@ -218,24 +218,23 @@ def main():
         type=str,
         default="api",
         choices=["api", "ollama", "huggingface"],
-        help="LLM provider for RAGAS evaluation (default: api)",
+        help="LLM judge provider for DeepEval (default: api)",
     )
     parser.add_argument(
-        "--ragas-batch-size",
-        type=int,
-        default=8,
-        help="Mini-batch size for RAGAS evaluation (default: 2 for API, use 10+ for local H100)",
-    )
-    parser.add_argument(
-        "--ragas-delay",
+        "--eval-delay",
         type=float,
-        default=1.0,
-        help="Delay in seconds between RAGAS mini-batches (default: 2.0 for API, use 0 for local)",
+        default=0.0,
+        help="Delay in seconds between evaluated questions (rate limiting; 0 for local judge)",
+    )
+    parser.add_argument(
+        "--no-correctness",
+        action="store_true",
+        help="Disable the G-Eval correctness metric (faster, RAG metrics only)",
     )
     parser.add_argument(
         "--checkpoint-dir",
         type=Path,
-        default=Path("results/checkpoint/ablation_study.json"),
+        default=Path("results/checkpoints"),
         help="Directory for checkpoint files (enables auto-save/resume)",
     )
     parser.add_argument(
@@ -257,17 +256,19 @@ def main():
         logger.error(f"Questions file not found: {args.questions}")
         sys.exit(1)
 
-    # Initialize RAGAS evaluator
-    logger.info(f"Initializing RAGAS evaluator with provider: {args.llm_provider}")
-    ragas_evaluator = RAGASEvaluator(llm_provider=args.llm_provider)
+    # Initialize DeepEval evaluator (fully local LLM judge)
+    logger.info(f"Initializing DeepEval evaluator with provider: {args.llm_provider}")
+    evaluator = DeepEvalEvaluator(
+        llm_provider=args.llm_provider,
+        include_correctness=not args.no_correctness,
+    )
 
     # Initialize ablation study
     ablation = AblationStudy(
         api_base_url=args.api_url,
-        ragas_evaluator=ragas_evaluator,
+        evaluator=evaluator,
         checkpoint_dir=args.checkpoint_dir,
-        ragas_batch_size=args.ragas_batch_size,
-        ragas_delay=args.ragas_delay,
+        eval_delay=args.eval_delay,
     )
 
     # Select configs
@@ -279,7 +280,7 @@ def main():
             "reranker_only": RERANKER_ONLY,
             "cot_enhanced": COT_ENHANCED,
             "multihop_only": MULTIHOP_ONLY,
-            "mutlihop_cot": MULTIHOP_COT,
+            "multihop_cot": MULTIHOP_COT,
             "cove_auto_only": COVE_AUTO_ONLY,
             "full_no_cove": FULL_NO_COVE,
             "full_cove_auto": FULL_COVE_AUTO,
